@@ -1,8 +1,33 @@
 export default function Signup() {
+  function handleSubmit(event) {
+    event.preventDefault();
 
-    function handleSubmit(event){
-        event.preventDefault();
-    }
+    // For easier managing of all different data via different inputs and checkmarks:
+    // we can create new object FormData, based on a special constructor function, which is built into browser:
+    const fd = new FormData(event.target);
+    // fd = form data object
+    // in order for that to work, all input/select/check fields must have 'name' attribute
+    // event.target of the submit-event is the form, so we are passing the form as argument to this object
+    // if we have names for each input, then we can call built in methods on fd-object
+
+    // const enteredEmail = fd.get('email');
+    // we can get value of the inout field named "email"
+    // const enteredPassword = fd.get('password');
+
+    // but to not get too many variables for all input fields, better to group all entered values into an object:
+
+    // we can see all data in console.log - but the field with name 'aquisition' is a multi value field,
+    // and we got only the last selected value, but not all (some browsers don't show any value here),
+    // so to fix that, we make sure that we get an array of all selected values for the acquisition-checkbox:
+    const acquisitionChannel = fd.getAll("acquisition");
+
+    const data = Object.fromEntries(fd.entries());
+    // calling the fromEntries- static method, and pass fd-object to it -> result: array of all input names & values
+    
+    data.acquisition = acquisitionChannel;
+    
+    console.log(data);
+  }
 
   return (
     <form onSubmit={handleSubmit}>
