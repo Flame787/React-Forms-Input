@@ -19,6 +19,7 @@ export default function Login() {
     console.log(enteredEmail, enteredPassword);
 
     // downside: reseting these values via refs is not the best practise, although it works:
+    // but we should not imperatively do changes in DOM via refs:
     // email.current.value = "";
     // password.current.value = "";
   }

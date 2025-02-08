@@ -27,6 +27,10 @@ export default function Signup() {
     data.acquisition = acquisitionChannel;
     
     console.log(data);
+
+    // event.target.reset();   
+    // resets the whole form, although it's imperative changing the DOM, but at least quicker 
+    // to write, than reset each single value like in refs (Login.jsx)
   }
 
   return (
@@ -118,7 +122,8 @@ export default function Signup() {
       <p className="form-actions">
         <button type="reset" className="button button-flat">
           Reset
-        </button>
+        </button> 
+        {/* reset button has type="reset", and therefore really resets all input-values (empties all fields) */}
         <button type="submit" className="button">
           Sign up
         </button>
