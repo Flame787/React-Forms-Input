@@ -1,0 +1,97 @@
+import { useState } from "react";
+
+export default function Login() {
+  // const [enteredEmail, setEnteredEmail] = useState("");
+  // const [enteredPassword, setEnteredPassword] = useState("");
+  // -> using some combined state instead many different states:
+  const [enteredValues, setEnteredValues] = useState({
+    email: "",
+    password: "",
+  });
+
+  function handleSubmit(event) {
+    // with <form onSubmit={handleSubmit}>, we will get an event-object, and it has a special method:
+    event.preventDefault(); // method prevents default browser behaviour
+    // (that the page is reloaded after button click, and to send an http request to backend (send form data))
+    console.log("Submitted!");
+    console.log(enteredValues);   // check the current state
+  }
+
+  // function handleEmailChange(event) {
+  //   setEnteredEmail(event.target.value);
+  // }
+  // function handlePasswordChange(event) {
+  //   setEnteredPassword(event.target.value);
+  // }
+
+  // -> one generic event-handling function instead of many different ones:
+
+  // function handleInputChange(identifier, event) {
+  //   setEnteredValues((prevValues) => ({
+  //     // create an object-value with: ({ })
+  //     ...prevValues,
+  //     [identifier]: event.target.value, // dinamically target some property in object, and set the property value
+  //   }));
+  // }
+
+  // shorter: value instead of event:
+  function handleInputChange(identifier, value) {
+    setEnteredValues((prevValues) => ({
+      // create an object-value with: ({ })
+      ...prevValues,
+      [identifier]: value, // dinamically target some property in object, and set the property value
+    }));
+  }
+
+  return (
+    // <form>
+    // adding onSubmit-prop, which will listen and execute a function, whenever the form is submitted by one of it's buttons
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+
+      <div className="control-row">
+        <div className="control no-margin">
+          <label htmlFor="email">Email</label>
+          {/* htmlFor="" - React eqivalent (originally: for=""), like className instead of class */}
+          <input
+            id="email"
+            type="email"
+            name="email"
+            // onChange={handleEmailChange}
+            // onChange={(event) => handleInputChange("email", event)}  // or extract a value from event:
+            onChange={(event) => handleInputChange("email", event.target.value)}
+            // getting more control if we wrap it in anonymous function, so that we acctually pass anonymous function
+            // as a value to the onChange-prop. And we can pass some value for identifier (property - email or password).
+            // as a 2nd argument we pass the (value of the) event (- which triggered the change)
+            //
+            // value={enteredEmail}
+            value={enteredValues.email}
+            // initial state value (empty) is transferred into state,
+            // but also each change that user makes in this field is reflected in the state
+          />
+        </div>
+
+        <div className="control no-margin">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            onChange={(event) =>
+              handleInputChange("password", event.target.value)
+            }
+            value={enteredValues.password}
+          />
+        </div>
+      </div>
+
+      <p className="form-actions">
+        <button className="button button-flat">Reset</button>
+        {/* <button type="button" className="button" onClick={handleSubmit}>Login</button> */}
+        {/* after a button inside a form is pressed, it automatically relaods the page - to prevent that:
+        we can set button type to button -> that button will not submit the form (default is: type="submit") */}
+        <button className="button">Login</button>
+      </p>
+    </form>
+  );
+}
