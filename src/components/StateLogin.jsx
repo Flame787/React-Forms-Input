@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import Input from "./Input";
+
 export default function Login() {
   // const [enteredEmail, setEnteredEmail] = useState("");
   // const [enteredPassword, setEnteredPassword] = useState("");
@@ -34,11 +36,14 @@ export default function Login() {
   // validation - better version: combination of validation on every keystroke + validation on lost focus:
   const emailIsInvalid = didEdit.email && !enteredValues.email.includes("@");
 
+  const passwordIsInvalid = didEdit.password && !enteredValues.password.trim().length < 6;  
+  // password shorter than 6 characters in invalid!
+
   function handleSubmit(event) {
     // with <form onSubmit={handleSubmit}>, we will get an event-object, and it has a special method:
     event.preventDefault(); // method prevents default browser behaviour
     // (that the page is reloaded after button click, and to send an http request to backend (send form data))
-    
+
     // ...recommended to also add  validation here... (as addition to validation on keystroke + lost focus)
     
     console.log("Submitted!");
@@ -97,14 +102,24 @@ export default function Login() {
       <h2>Login</h2>
 
       <div className="control-row">
-        <div className="control no-margin">
+        <Input
+          label="Email"
+          id="email"
+          type="email"
+          name="email"
+          onBlur={() => handleInputBlur("email")}
+          onChange={(event) => handleInputChange("email", event.target.value)}
+          value={enteredValues.email}
+          error={emailIsInvalid && "Please enter a valid email."}
+        />
+        {/* <div className="control no-margin">
           <label htmlFor="email">Email</label>
           {/* htmlFor="" - React eqivalent (originally: for=""), like className instead of class */}
-          <input
+        {/* <input
             id="email"
             type="email"
-            name="email"
-            // new prop: onBlur (when input field looses the focus, and user is writing somewhere else now):
+            name="email" */}
+        {/* // new prop: onBlur (when input field looses the focus, and user is writing somewhere else now):
             onBlur={() => handleInputBlur("email")} // passing the identifier (= email) to this function
             // onChange={handleEmailChange}
             // onChange={(event) => handleInputChange("email", event)}  // or extract a value from event:
@@ -117,13 +132,27 @@ export default function Login() {
             value={enteredValues.email}
             // initial state value (empty) is transferred into state,
             // but also each change that user makes in this field is reflected in the state
-          />
-          <div className="control-error">
+          /> */}
+        {/* <div className="control-error">
             {emailIsInvalid && <p>Please enter a valid email address</p>}
-          </div>
-        </div>
+          </div> */}
+        {/* </div>  */}
 
-        <div className="control no-margin">
+        {/* reusing the custom component also for password-input: */}
+        <Input
+          label="Password"
+          id="password"
+          type="password"
+          name="password"
+          onBlur={() => handleInputBlur("password")}
+          onChange={(event) =>
+            handleInputChange("password", event.target.value)
+          }
+          value={enteredValues.password}
+          error={passwordIsInvalid && "Please enter a valid password."}
+        />
+
+        {/* <div className="control no-margin">
           <label htmlFor="password">Password</label>
           <input
             id="password"
@@ -134,7 +163,7 @@ export default function Login() {
             }
             value={enteredValues.password}
           />
-        </div>
+        </div> */}
       </div>
 
       <p className="form-actions">

@@ -10,9 +10,9 @@ function App() {
     <>
       <Header />
       <main>
-        {/* <StateLogin /> */}
+        <StateLogin />
         {/* <Login /> */}
-        <Signup />   
+        {/* <Signup /> */}
         {/* replaced Login with Signup, for testing different approaches */}
       </main>
     </>
