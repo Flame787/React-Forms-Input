@@ -1,3 +1,5 @@
+// outsourcing validation logic from this file into the StateLogin.jsx: 
+
 export function isEmail(value) {
   return value.includes('@');
 }

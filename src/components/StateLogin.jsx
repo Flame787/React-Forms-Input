@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import Input from "./Input";
+import { isEmail, isNotEmpty, hasMinLength } from "../util/validation.js";
 
 export default function Login() {
   // const [enteredEmail, setEnteredEmail] = useState("");
@@ -34,10 +35,16 @@ export default function Login() {
   // but error is showing too early (at the first keystroke) and dosn't work retrogradly, if user enters and later deletes @
 
   // validation - better version: combination of validation on every keystroke + validation on lost focus:
-  const emailIsInvalid = didEdit.email && !enteredValues.email.includes("@");
+  // const emailIsInvalid = didEdit.email && !enteredValues.email.includes("@");
+  // outsourcing validation logic from util -> validation.js: !isEmail and passing the current value as argument to be checked
+  const emailIsInvalid =
+    didEdit.email &&
+    !isEmail(enteredValues.email) &&
+    !isNotEmpty(enteredValues.email);
 
-  const passwordIsInvalid = didEdit.password && !enteredValues.password.trim().length < 6;  
+  // const passwordIsInvalid = didEdit.password && !enteredValues.password.trim().length < 6;
   // password shorter than 6 characters in invalid!
+  const passwordIsInvalid = didEdit.password && !hasMinLength(enteredValues.password, 6);
 
   function handleSubmit(event) {
     // with <form onSubmit={handleSubmit}>, we will get an event-object, and it has a special method:
@@ -45,7 +52,7 @@ export default function Login() {
     // (that the page is reloaded after button click, and to send an http request to backend (send form data))
 
     // ...recommended to also add  validation here... (as addition to validation on keystroke + lost focus)
-    
+
     console.log("Submitted!");
     console.log(enteredValues); // check the current state
 
