@@ -38,6 +38,9 @@ export default function Login() {
     // with <form onSubmit={handleSubmit}>, we will get an event-object, and it has a special method:
     event.preventDefault(); // method prevents default browser behaviour
     // (that the page is reloaded after button click, and to send an http request to backend (send form data))
+    
+    // ...recommended to also add  validation here... (as addition to validation on keystroke + lost focus)
+    
     console.log("Submitted!");
     console.log(enteredValues); // check the current state
 
