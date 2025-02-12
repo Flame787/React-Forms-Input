@@ -1,17 +1,18 @@
-import { useState } from "react";
+// import { useState } from "react";
 
 import Input from "./Input";
 import { isEmail, isNotEmpty, hasMinLength } from "../util/validation.js";
+import { useInput } from "../hooks/useInput.js";
 
 export default function Login() {
   // const [enteredEmail, setEnteredEmail] = useState("");
   // const [enteredPassword, setEnteredPassword] = useState("");
   // -> using some combined state instead many different states:
 
-  const [enteredValues, setEnteredValues] = useState({
-    email: "",
-    password: "",
-  });
+  // const [enteredValues, setEnteredValues] = useState({
+  //   email: "",
+  //   password: "",
+  // });
 
   // nested state, a possibility to add the Blur/Focus-status:
 
@@ -23,11 +24,31 @@ export default function Login() {
   //   password: "",
   // });
 
-  // or just add another peace of state: didEdit = lost Focus, after user interacted with them (edited them before)
-  const [didEdit, setDidEdit] = useState({
-    email: false,
-    password: false,
+  // (useState was exported to custom hook useInput):
+  const {
+    value: emailValue,
+    handleInputChange: handleEmailChange,
+    handleInputBlur: handleEmailBlur,
+    hasError: emailHasError,
+  } = useInput("", (value) => {
+    // ...
+    return isEmail(value) && isNotEmpty(value);
   });
+  // deconstruct object to values, and assigning functions as values to prop-functions
+
+  const {
+    value: passwordValue,
+    handleInputChange: handlePasswordChange,
+    handleInputBlur: handlePasswordBlur,
+    hasError: passwordHasError,
+  } = useInput("", (value) => hasMinLength(value, 6));
+
+  // or just add another peace of state: didEdit = lost Focus, after user interacted with them (edited them before)
+  // (exported to custom hook):
+  // const [didEdit, setDidEdit] = useState({
+  //   email: false,
+  //   password: false,
+  // });
 
   // validation:
   // const emailIsInvalid = enteredValues.email !== "" && !enteredValues.email.includes("@");
@@ -37,14 +58,15 @@ export default function Login() {
   // validation - better version: combination of validation on every keystroke + validation on lost focus:
   // const emailIsInvalid = didEdit.email && !enteredValues.email.includes("@");
   // outsourcing validation logic from util -> validation.js: !isEmail and passing the current value as argument to be checked
-  const emailIsInvalid =
-    didEdit.email &&
-    !isEmail(enteredValues.email) &&
-    !isNotEmpty(enteredValues.email);
+  // const emailIsInvalid =
+  //   didEdit.email &&
+  //   !isEmail(enteredValues.email) &&
+  //   !isNotEmpty(enteredValues.email);
 
   // const passwordIsInvalid = didEdit.password && !enteredValues.password.trim().length < 6;
   // password shorter than 6 characters in invalid!
-  const passwordIsInvalid = didEdit.password && !hasMinLength(enteredValues.password, 6);
+  // const passwordIsInvalid =
+  //   didEdit.password && !hasMinLength(enteredValues.password, 6);
 
   function handleSubmit(event) {
     // with <form onSubmit={handleSubmit}>, we will get an event-object, and it has a special method:
@@ -52,9 +74,14 @@ export default function Login() {
     // (that the page is reloaded after button click, and to send an http request to backend (send form data))
 
     // ...recommended to also add  validation here... (as addition to validation on keystroke + lost focus)
+    
+    if (emailHasError || passwordHasError) {
+      return;
+    }
 
     console.log("Submitted!");
-    console.log(enteredValues); // check the current state
+    // console.log(enteredValues); // check the current state
+    console.log(emailValue, passwordValue);  // we can potentially also send that info to backend
 
     // setEnteredValues({
     //   email: "",
@@ -80,27 +107,29 @@ export default function Login() {
   // }
 
   // shorter: value instead of event:
-  function handleInputChange(identifier, value) {
-    setEnteredValues((prevValues) => ({
-      // create an object-value with: ({ })
-      ...prevValues,
-      [identifier]: value, // dinamically target some property in object, and set the property value
-    }));
-    // error-message about missing @ dissapears when user adds focus into email-field again and continues typing:
-    setDidEdit((prevEdit) => ({
-      ...prevEdit,
-      [identifier]: false,
-    }));
-  }
+  // moving these functions to a custom hook:
 
-  function handleInputBlur(identifier) {
-    // returning a new object
-    setDidEdit((prevEdit) => ({
-      ...prevEdit,
-      [identifier]: true, // changing the state for email or password, depending on identifier
-      // spreading old state, so that we don't loose data on another peace of state (email / password)
-    }));
-  }
+  // function handleInputChange(identifier, value) {
+  //   setEnteredValues((prevValues) => ({
+  //     // create an object-value with: ({ })
+  //     ...prevValues,
+  //     [identifier]: value, // dinamically target some property in object, and set the property value
+  //   }));
+  //   // error-message about missing @ dissapears when user adds focus into email-field again and continues typing:
+  //   setDidEdit((prevEdit) => ({
+  //     ...prevEdit,
+  //     [identifier]: false,
+  //   }));
+  // }
+
+  // function handleInputBlur(identifier) {
+  //   // returning a new object
+  //   setDidEdit((prevEdit) => ({
+  //     ...prevEdit,
+  //     [identifier]: true, // changing the state for email or password, depending on identifier
+  //     // spreading old state, so that we don't loose data on another peace of state (email / password)
+  //   }));
+  // }
 
   return (
     // <form>
@@ -114,10 +143,14 @@ export default function Login() {
           id="email"
           type="email"
           name="email"
-          onBlur={() => handleInputBlur("email")}
-          onChange={(event) => handleInputChange("email", event.target.value)}
-          value={enteredValues.email}
-          error={emailIsInvalid && "Please enter a valid email."}
+          // onBlur={() => handleInputBlur("email")}
+          onBlur={handleEmailBlur}
+          // onChange={(event) => handleInputChange("email", event.target.value)}
+          onChange={handleEmailChange}
+          // value={enteredValues.email}
+          value={emailValue}
+          // error={emailIsInvalid && "Please enter a valid email."}
+          error={emailHasError && "Please enter a valid email."}
         />
         {/* <div className="control no-margin">
           <label htmlFor="email">Email</label>
@@ -151,12 +184,14 @@ export default function Login() {
           id="password"
           type="password"
           name="password"
-          onBlur={() => handleInputBlur("password")}
-          onChange={(event) =>
-            handleInputChange("password", event.target.value)
-          }
-          value={enteredValues.password}
-          error={passwordIsInvalid && "Please enter a valid password."}
+          // onBlur={() => handleInputBlur("password")}
+          onBlur={handlePasswordBlur}
+          // onChange={(event) => handleInputChange("password", event.target.value)}
+          onChange={handlePasswordChange}
+          // value={enteredValues.password}
+          value={passwordValue}
+          // error={passwordIsInvalid && "Please enter a valid password."}
+          error={passwordHasError && "Please enter a valid password."}
         />
 
         {/* <div className="control no-margin">
